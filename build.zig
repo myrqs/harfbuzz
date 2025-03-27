@@ -7,7 +7,7 @@ pub fn build(b: *std.Build) !void {
     const coretext_enabled = b.option(bool, "enable-coretext", "Build coretext") orelse false;
     const freetype_enabled = b.option(bool, "enable-freetype", "Build freetype") orelse true;
 
-    const freetype = b.dependency("freetype", .{
+    const freetype_dep = b.dependency("freetype", .{
         .target = target,
         .optimize = optimize,
         .@"enable-libpng" = true,
@@ -19,7 +19,7 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
         .imports = &.{
-            .{ .name = "freetype", .module = freetype.module("freetype") },
+            .{ .name = "freetype", .module = freetype_dep.module("freetype") },
         },
     });
 
@@ -33,11 +33,6 @@ pub fn build(b: *std.Build) !void {
     lib.addIncludePath(upstream.path("src"));
     module.addIncludePath(upstream.path("src"));
 
-    const freetype_dep = b.dependency("freetype", .{
-        .target = target,
-        .optimize = optimize,
-        .@"enable-libpng" = true,
-    });
     lib.linkLibrary(freetype_dep.artifact("freetype"));
     module.addIncludePath(freetype_dep.builder.dependency("freetype", .{}).path("include"));
 
